@@ -5,6 +5,7 @@ import 'package:planetx/pages/home/home_page_provider.dart';
 import 'package:planetx/pages/home/screens/account.dart';
 import 'package:planetx/pages/home/screens/notifications.dart';
 import 'package:planetx/pages/home/screens/search.dart';
+import 'package:planetx/pages/new_post/new_post.dart';
 import 'package:provider/provider.dart';
 
 import 'screens/feed/feed.dart';
@@ -36,7 +37,9 @@ class HomePage extends StatelessWidget {
         },
       ),
       floatingActionButton: FloatingActionButton.small(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.of(context).pushNamed(NewPost.routeName);
+        },
         child: Icon(Icons.add),
       ),
       bottomNavigationBar: const BottomNavBar(),

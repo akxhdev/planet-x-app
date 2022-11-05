@@ -5,12 +5,14 @@ class Post {
   final DateTime createdAt;
   final String postedBy;
   final String content;
+  final String? imageUrl;
 
   Post({
     required this.id,
     required this.createdAt,
     required this.postedBy,
     required this.content,
+    this.imageUrl,
   });
 
   Post copyWith({
@@ -18,12 +20,14 @@ class Post {
     DateTime? createdAt,
     String? postedBy,
     String? content,
+    String? imageUrl,
   }) {
     return Post(
       id: id ?? this.id,
       createdAt: createdAt ?? this.createdAt,
       postedBy: postedBy ?? this.postedBy,
       content: content ?? this.content,
+      imageUrl: imageUrl ?? this.imageUrl,
     );
   }
 
@@ -33,6 +37,7 @@ class Post {
       'createdAt': createdAt.millisecondsSinceEpoch,
       'postedBy': postedBy,
       'content': content,
+      'imageUrl': imageUrl,
     };
   }
 
@@ -42,6 +47,7 @@ class Post {
       createdAt: DateTime.parse(map['createdAt']),
       postedBy: map['postedBy'] ?? '',
       content: map['content'] ?? '',
+      imageUrl: map['imageUrl'],
     );
   }
 
@@ -51,7 +57,7 @@ class Post {
 
   @override
   String toString() {
-    return 'Post(id: $id, createdAt: $createdAt, postedBy: $postedBy, content: $content)';
+    return 'Post(id: $id, createdAt: $createdAt, postedBy: $postedBy, content: $content, imageUrl: $imageUrl)';
   }
 
   @override
@@ -62,7 +68,8 @@ class Post {
         other.id == id &&
         other.createdAt == createdAt &&
         other.postedBy == postedBy &&
-        other.content == content;
+        other.content == content &&
+        other.imageUrl == imageUrl;
   }
 
   @override
@@ -70,6 +77,7 @@ class Post {
     return id.hashCode ^
         createdAt.hashCode ^
         postedBy.hashCode ^
-        content.hashCode;
+        content.hashCode ^
+        imageUrl.hashCode;
   }
 }

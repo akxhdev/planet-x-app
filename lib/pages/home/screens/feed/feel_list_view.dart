@@ -14,6 +14,7 @@ class FeedListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.separated(
+      padding: const EdgeInsets.only(bottom: 18),
       separatorBuilder: (context, index) => const Divider(),
       itemBuilder: (context, index) => FeedListViewItem(post: posts[index]),
       itemCount: posts.length,

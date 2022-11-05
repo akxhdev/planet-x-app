@@ -8,6 +8,12 @@ import 'package:planetx/services/post/post_service.dart';
 import 'package:http/http.dart' as http;
 
 class PostServiceImpl implements PostService {
+  static PostServiceImpl? _instance;
+
+  static PostServiceImpl get instance => _instance ?? PostServiceImpl._();
+
+  PostServiceImpl._();
+
   final _hostUri = Uri.parse(endPoint[Services.posts]!);
 
   @override
@@ -43,11 +49,5 @@ class PostServiceImpl implements PostService {
     } catch (e) {
       rethrow;
     }
-  }
-
-  @override
-  Future<Post> createImagePost(NewPostRequest request, String token) {
-    // TODO: implement createImagePost
-    throw UnimplementedError();
   }
 }

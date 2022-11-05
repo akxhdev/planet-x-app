@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:planetx/pages/home/screens/feed/feel_list_view.dart';
-import 'package:planetx/providers/auth_provider.dart';
 import 'package:planetx/providers/post_provider.dart';
 import 'package:planetx/widgets/error_text.dart';
 import 'package:planetx/widgets/loading_spinner.dart';
@@ -11,12 +10,9 @@ class FeedScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final token =
-        Provider.of<AuthProvider>(context, listen: false).alien!.token;
-
     var postRepository = Provider.of<PostProvider>(context, listen: false);
 
-    postRepository.loadData(token);
+    postRepository.loadData();
 
     return StreamBuilder(
       stream: postRepository.postsStream,
@@ -24,7 +20,7 @@ class FeedScreen extends StatelessWidget {
         // data loaded --> show feeds list
         if (snapshot.hasData) {
           return RefreshIndicator(
-            onRefresh: () => postRepository.refresh(token),
+            onRefresh: () => postRepository.refresh(),
             child: FeedListView(posts: snapshot.data!),
           );
         }

@@ -3,37 +3,54 @@ import 'package:image_picker/image_picker.dart';
 import 'package:planetx/models/new_post_request.dart';
 
 class NewPostPageProvider with ChangeNotifier {
-  final _formData = <NewPostForm, dynamic>{
-    NewPostForm.content: "",
-    NewPostForm.image: null,
-  };
+  final String alienId;
+  final Future<void> Function(NewPostRequest)? createPost;
+  final Map<NewPostForm, dynamic> formData;
+  final GlobalKey<FormState> formKey;
+  final Future<String> Function(XFile)? uploadImage;
 
-  final _formKey = GlobalKey<FormState>();
+  bool _showProgressIndicator = false;
 
-  GlobalKey<FormState> get formKey => _formKey;
+  NewPostPageProvider({
+    required this.alienId,
+    this.createPost,
+    required this.formData,
+    required this.formKey,
+    this.uploadImage,
+  });
+
+  bool get showProgressIndicator => _showProgressIndicator;
 
   void onChangeField(NewPostForm field, dynamic value) {
-    _formData[field] = value;
+    formData[field] = value;
     notifyListeners();
   }
 
-  XFile? get image => _formData[NewPostForm.image];
+  bool get _isFormValid => formKey.currentState?.validate() ?? false;
 
-  NewPostRequest? generatePostRequest(String alienId) {
-    var formState = formKey.currentState;
+  Future<void> onPressed() async {
+    if (!_isFormValid || createPost == null || uploadImage == null) return;
 
-    if (formState != null) {
-      var isValid = formState.validate();
+    final content = formData[NewPostForm.content];
 
-      if (isValid) {
-        return NewPostRequest(
-          content: _formData[NewPostForm.content]!,
-          postedBy: alienId,
-        );
-      }
+    if (content == null) return;
+
+    var newPostRequest = NewPostRequest(
+      content: content,
+      postedBy: alienId,
+    );
+
+    final imageFile = formData[NewPostForm.image];
+
+    if (imageFile != null) {
+      _showProgressIndicator = true;
+      notifyListeners();
+
+      final imageTempUrl = await uploadImage!(imageFile);
+
+      newPostRequest = newPostRequest.copyWith(imageUrl: imageTempUrl);
     }
-
-    return null;
+    await createPost!(newPostRequest);
   }
 }
 

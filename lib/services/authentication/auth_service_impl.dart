@@ -8,9 +8,13 @@ import 'package:http/http.dart' as http;
 import '../commons.dart';
 
 class AuthServiceImpl implements AuthService {
-  final _hostUri = Uri.parse(endPoint[Services.auth]!);
+  static AuthServiceImpl? _instance;
 
-  AuthServiceImpl();
+  static AuthServiceImpl get instance => _instance ?? AuthServiceImpl._();
+
+  AuthServiceImpl._();
+
+  final _hostUri = Uri.parse(endPoint[Services.auth]!);
 
   @override
   Future<AuthResponse> authenticate(AuthRequest request) async {

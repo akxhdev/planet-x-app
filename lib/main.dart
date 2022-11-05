@@ -5,8 +5,11 @@ import 'package:planetx/pages/base_page.dart';
 import 'package:planetx/pages/new_post/new_post.dart';
 import 'package:planetx/pages/new_post/new_post_page_provider.dart';
 import 'package:planetx/providers/auth_provider.dart';
+import 'package:planetx/providers/image_upload_provider.dart';
 import 'package:planetx/providers/post_provider.dart';
 import 'package:planetx/services/authentication/auth_service_impl.dart';
+import 'package:planetx/services/image_upload/image_upload_service.dart';
+import 'package:planetx/services/image_upload/image_upload_service_impl.dart';
 import 'package:provider/provider.dart';
 
 import 'services/post/post_service_impl.dart';
@@ -22,12 +25,34 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) {
-          var authService = AuthServiceImpl();
-          return AuthProvider(authService);
-        }),
-        ChangeNotifierProvider(
-          create: (context) => PostProvider(PostServiceImpl()),
+        ChangeNotifierProvider.value(
+          value: AuthProvider(authService: AuthServiceImpl.instance),
+        ),
+        ChangeNotifierProxyProvider<AuthProvider, PostProvider>(
+          create: (context) => PostProvider(
+            token: Provider.of<AuthProvider>(context, listen: false).token,
+            postService: PostServiceImpl.instance,
+          ),
+          update: (_, authProvider, previous) {
+            return PostProvider(
+              postService: previous?.postService ?? PostServiceImpl.instance,
+              token: previous?.token ?? authProvider.token,
+              posts: previous?.posts ?? [],
+            );
+          },
+        ),
+        ChangeNotifierProxyProvider<AuthProvider, ImageUploadProvider>(
+          create: (context) => ImageUploadProvider(
+            imageUploadService: ImageUploadServiceImpl.instance,
+            token: Provider.of<AuthProvider>(context, listen: false).token,
+          ),
+          update: (context, authProvider, previous) {
+            return ImageUploadProvider(
+              imageUploadService: previous?.imageUploadService ??
+                  ImageUploadServiceImpl.instance,
+              token: previous?.token ?? authProvider.token,
+            );
+          },
         ),
       ],
       child: DynamicColorBuilder(
@@ -44,8 +69,31 @@ class MyApp extends StatelessWidget {
           home: const BasePage(),
           routes: {
             NewPost.routeName: (context) {
-              return ChangeNotifierProvider(
-                create: (context) => NewPostPageProvider(),
+              return ChangeNotifierProxyProvider3<AuthProvider, PostProvider,
+                  ImageUploadProvider, NewPostPageProvider>(
+                create: (context) => NewPostPageProvider(
+                  alienId:
+                      Provider.of<AuthProvider>(context, listen: false).alienId,
+                  formData: {
+                    NewPostForm.content: "",
+                    NewPostForm.image: null,
+                  },
+                  formKey: GlobalKey<FormState>(),
+                ),
+                update: (_, authProvider, postProvider, imageUploadProvider,
+                    previous) {
+                  return NewPostPageProvider(
+                    alienId: authProvider.alienId,
+                    createPost: postProvider.createPost,
+                    formData: previous?.formData ??
+                        {
+                          NewPostForm.content: "",
+                          NewPostForm.image: null,
+                        },
+                    formKey: previous?.formKey ?? GlobalKey<FormState>(),
+                    uploadImage: imageUploadProvider.uploadImage,
+                  );
+                },
                 child: const NewPost(),
               );
             },

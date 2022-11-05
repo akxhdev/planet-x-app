@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class NewPostFormField extends StatelessWidget {
   final String? label;
   final String? hint;
+  final String? initialValue;
   final String? Function(String?)? validator;
 
   final void Function(String)? onChnaged;
@@ -11,6 +12,7 @@ class NewPostFormField extends StatelessWidget {
     Key? key,
     this.label,
     this.hint,
+    this.initialValue,
     this.validator,
     this.onChnaged,
   }) : super(key: key);
@@ -18,6 +20,7 @@ class NewPostFormField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      initialValue: initialValue,
       autofocus: true,
       decoration: InputDecoration(
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
